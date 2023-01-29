@@ -1,0 +1,208 @@
+openapi: 3.0.3
+info:
+  title: Manage Recipes
+  description: |-
+    This is an API used to create,update,delete and retrieve the recipes stored in the database. User can provide various search parameters like ingredient, type, serach text to retrieve and manage the recipes of choice.
+  contact:
+    email: gaurvitasta@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+tags:
+  - name: reciepes
+    description: Everything about Recipes
+  - name: user
+    description: Operations about user
+paths:
+  /reciepes:
+    put:
+      tags:
+        - reciepes
+      summary: Update an existing reciepe
+      description: Update an existing reciepe by Id
+      operationId: updateReciepe
+      requestBody:
+        description: Update an existent reciepe.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reciepe'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reciepe'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Reciepe not found
+        '405':
+          description: Validation exception
+      security:
+        - reciepe_auth:
+            - write:reciepes
+            - read:reciepes
+    post:
+      tags:
+        - reciepes
+      summary: Add a new reciepe to the store
+      description: Add a new reciepe to the store
+      operationId: addReciepe
+      requestBody:
+        description: Create a new reciepe
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reciepe'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reciepe'
+        '405':
+          description: Invalid input
+      security:
+        - reciepe_auth:
+            - write:reciepes
+            - read:reciepes
+    get:
+      tags:
+        - reciepes
+      summary: Finds reciepes by filter parameters
+      operationId: findReciepes
+      parameters:
+        - name: dishType
+          in: query
+          description: Type of the reciepe like vegetarian or italian
+          required: false
+          schema:
+            type: string
+        - name: servings
+          in: query
+          description: number of servings for the reciepe
+          required: false
+          schema:
+            type: integer
+        - name: ingredient
+          in: query
+          description: Ingredient of the reciepe
+          required: false
+          schema:
+            type: string
+        - name: additionalContent
+          in: query
+          description: additional text/content about the reciepe
+          required: false
+          schema:
+            type: string
+        - name: name
+          in: query
+          description: name of the reciepe
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reciepe'
+        '404':
+          description: No Reciepe available
+      security:
+        - reciepe_auth:
+            - write:reciepes
+            - read:reciepes
+  /reciepes/{name}:
+    delete:
+      tags:
+        - reciepes
+      summary: Deletes a reciepes
+      description: delete a reciepes
+      operationId: deleteReciepes
+      parameters:
+        - name: api_key
+          in: header
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: name
+          in: path
+          description: reciepe name to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid reciepe value
+      security:
+        - reciepe_auth:
+            - write:reciepes
+            - read:reciepes
+components:
+  schemas:
+    Reciepe:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: Fish Curry
+        dishType:
+          type: string
+          example: vegetarian
+        ingredient:
+          type: string
+          example: tomato,potato
+        servings:
+          type: integer
+          format: int32
+          example: 7
+        additionalText:
+          type: string
+    ApiError:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        timestamp:
+          type: string
+          format: date-time
+          pattern: "dd-MM-yyyy hh:mm:ss"
+        message:
+          type: string
+  requestBodies:
+    Pet:
+      description: Pet object that needs to be added to the store
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Reciepe'
+  securitySchemes:
+    reciepe_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+          scopes:
+            write:pets: modify Reciepe in your account
+            read:pets: read your Reciepe
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
