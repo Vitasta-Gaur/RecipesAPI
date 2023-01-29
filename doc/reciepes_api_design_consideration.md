@@ -12,6 +12,7 @@ The objective is to design an API that can serve multiple options to manage the 
 
 * API First Design is Followed
 * Postgress DB is used to manage the data
+* API will be hosted behind API Gateway.
 
 ## Consequences
 

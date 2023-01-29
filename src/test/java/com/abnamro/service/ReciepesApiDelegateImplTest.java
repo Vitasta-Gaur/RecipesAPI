@@ -49,7 +49,6 @@ class ReciepesApiDelegateImplTest {
 
     @Test
     void givenValidReciepe_whenFindReciepe_thenRecipesAreReturned() {
-        //Mockito.when(mapper.map(Mockito.any(Reciepe.class),Mockito.any())).thenReturn(getReciepes());
         Mockito.when(reciepeRepository.findReciepesByNameAndIngredientAndServingsAndAdditionalData(Mockito.any(),Mockito.any(),Mockito.any(),Mockito.any(),Mockito.any()))
                 .thenReturn(Arrays.asList(getReciepes()));
 

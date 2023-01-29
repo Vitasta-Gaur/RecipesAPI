@@ -162,6 +162,7 @@ components:
         name:
           type: string
           example: Fish Curry
+          nullable: false
         dishType:
           type: string
           example: vegetarian

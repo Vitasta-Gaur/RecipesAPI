@@ -135,33 +135,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>pre-integration-test</id>
-                        <goals>
-                            <goal>start</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>post-integration-test</id>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <wait>1500</wait>
-                    <jmxPort>9009</jmxPort>
-                    <!-- This is one way to set the active profile in Spring -->
-                    <profiles>
-                        <profile>integration-test</profile>
-                    </profiles>
-                    <!-- This is another way to set the active profile in Spring
-                    <environmentVariables>
-                        <SPRING_PROFILES_ACTIVE>integration-test</SPRING_PROFILES_ACTIVE>
-                    </environmentVariables>
-                    -->
-                </configuration>
             </plugin>
 
             <plugin>

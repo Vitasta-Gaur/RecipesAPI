@@ -30,6 +30,10 @@ docker-compose down
 * The design records are documented as ADR's under folder /doc. 
 * Swagger spec is placed under folder /resources/swagger. 
 
+## Next Phase - Next Sprint 
+
+* Enable Security - Valid JWT Tokens ##ToDo
+* Enable JPA Auditing ###ToDo
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
