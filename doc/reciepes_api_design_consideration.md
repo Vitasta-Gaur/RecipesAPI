@@ -8,11 +8,14 @@ Proposed
 
 The objective is to design an API that can serve multiple options to manage the recipes.
 
+## Assumption
+
+* API will be hosted behind the API Gateway to ensure security.
+
 ## Decision
 
-* API First Design is Followed
-* Postgress DB is used to manage the data
-* API will be hosted behind API Gateway.
+* API First Design is Followed. Swagger documentation can be found [here](https://github.com/Vitasta-Gaur/RecipesAPI/blob/2ddb0af504f0d2db0d0d74d68452f4d593ffae41/src/main/resources/swagger/reciepes_api.yaml).
+* Postgress DB is considered to manage and work with the data.
 
 ## Consequences
 
