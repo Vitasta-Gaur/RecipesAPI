@@ -36,7 +36,8 @@ public class ReciepeRequestAdvise extends ResponseEntityExceptionHandler {
         if (ex instanceof ReciepeException) {
             apiError.setCode(HttpStatus.BAD_REQUEST.value());
             apiError.setMessage(ex.getMessage());
-        } else {
+        }
+        else {
             apiError.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             apiError.setMessage("Please contact API team. Request processing failed!");
         }

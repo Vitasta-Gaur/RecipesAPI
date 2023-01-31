@@ -1,4 +1,4 @@
-package com.abnamro.service.integration.tests;
+package com.abnamro.integration.tests;
 
 import org.junit.jupiter.api.Tag;
 import org.springframework.test.context.ActiveProfiles;

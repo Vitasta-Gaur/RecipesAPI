@@ -11,13 +11,12 @@ import java.util.List;
 @Repository
 public interface ReciepeRepository extends JpaRepository<Reciepes,String> {
 
-    @Query("SELECT c FROM Reciepes c WHERE (:name is null or c.name = :name) and (:ingredient is null"
-            + " or c.ingredient like %:ingredient%) and (:servings is null or c.servings >= :servings) and (:additionalData is null or c.additionalText like %:additionalData%) " +
-            "and (:dishType is null or c.dishType = :dishType)")
+    @Query("SELECT c FROM Reciepes c WHERE (:name is null or c.name = :name) "
+            + " and (:servings is null or c.servings >= :servings) and (:instructions is null or c.instructions like %:instructions%) " +
+            "and (:dishType is null or c.dishType = :dishType) and (:ingredient is null or c.ingredient like %:ingredient%) ")
     List<Reciepes> findReciepesByNameAndIngredientAndServingsAndAdditionalData(
-            @Param("name") String name, @Param("ingredient") String ingredient,
-            @Param("servings") Integer servings , @Param("additionalData") String additionalData,
-            @Param("dishType") String dishType);
-
-
+            @Param("name") String name,
+            @Param("servings") Integer servings , @Param("instructions") String instructions,
+            @Param("dishType") String dishType ,
+            @Param("ingredient") String ingredient);
 }

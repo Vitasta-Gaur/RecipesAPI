@@ -1,30 +1,35 @@
 package com.abnamro.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.Table;
+import java.time.OffsetDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @Entity
 @Table(name = "reciepes")
 public class Reciepes {
 
     @Id
     private String name;
-    @Lob
+
+    @Column(name = "ingredient", columnDefinition = "text")
     private String ingredient;
     private Integer servings;
-    @Lob
-    @Column(name = "additional_data")
-    private String additionalText;
+    @Column(columnDefinition = "text")
+    private String instructions;
     @Column(name = "dish_type")
     private String dishType;
+
+    @Column(name = "cook_time")
+    private String cookTime;
+
+    @Column(name = "created", columnDefinition = "TIME WITH TIME ZONE")
+    private OffsetDateTime created;
+
+    @Column(name = "updated", columnDefinition = "TIME WITH TIME ZONE")
+    private OffsetDateTime updated;
 }

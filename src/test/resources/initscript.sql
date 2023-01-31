@@ -1,4 +1,4 @@
-DROP TABLE reciepes;
+DROP TABLE if exists reciepes;
 CREATE TABLE reciepes (
     ingredient	        text,
     servings            INTEGER,
@@ -9,6 +9,4 @@ CREATE TABLE reciepes (
     updated             TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     cook_time           VARCHAR(100)
 );
-
-
 

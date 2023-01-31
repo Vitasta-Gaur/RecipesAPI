@@ -1,7 +1,6 @@
-package com.abnamro.service.integration.tests;
+package com.abnamro.integration.tests;
 
 
-import com.abnamro.entity.Reciepes;
 import com.abnamro.model.Reciepe;
 import com.abnamro.repository.ReciepeRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -10,21 +9,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.http.*;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Testcontainers
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @IntegrationTests
+@Sql({"classpath:initscript.sql"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(
-        locations = "classpath:application-it.properties")
-public class RecipeIT {
+public class RecipeIT extends AbstractIntegrationTest {
 
     @Value(value="${local.server.port}")
     private int port;
@@ -46,7 +45,7 @@ public class RecipeIT {
 
     @Test
     public void whenGetReciepes_thenStatus200() throws Exception {
-        addReciepes();
+        reciepeRepository.saveAndFlush(getReciepes());
         ResponseEntity<List> entity = this.restTemplate.getForEntity("http://localhost:" + port + "/reciepes",
                 List.class);
         assertThat(entity).isNotNull();
@@ -56,7 +55,7 @@ public class RecipeIT {
 
     @Test
     public void whenDeleteReciepes_thenStatus200() throws Exception {
-        addReciepes();
+        reciepeRepository.saveAndFlush(getReciepes());
         ResponseEntity entity = this.restTemplate.exchange("http://localhost:" + port + "/reciepes/Curry", HttpMethod.DELETE,null, RequestEntity.class);
         assertThat(entity).isNotNull();
         assertThat(entity.getStatusCodeValue()).isEqualTo(200);
@@ -64,10 +63,7 @@ public class RecipeIT {
 
     @Test
     public void whenAddReciepes_thenStatus201() throws Exception {
-        Reciepe reciepes = new Reciepe();
-        reciepes.setName("Curry");
-        reciepes.setDishType("Vegetarian");
-        HttpEntity<Reciepe> request = new HttpEntity<>(reciepes);
+        HttpEntity<Reciepe> request = new HttpEntity<>(getRecipeRequest());
         ResponseEntity entity = this.restTemplate.exchange("http://localhost:" + port + "/reciepes", HttpMethod.POST,request, Reciepe.class);
         assertThat(entity).isNotNull();
         assertThat(entity.getStatusCodeValue()).isEqualTo(201);
@@ -75,26 +71,18 @@ public class RecipeIT {
 
     @Test
     public void whenUpdateReciepes_thenStatus201() throws Exception {
-        addReciepes();
+        reciepeRepository.saveAndFlush(getReciepes());
 
-        Reciepe reciepes = new Reciepe();
-        reciepes.setName("Curry");
-        reciepes.setDishType("Vegetarian");
-        HttpEntity<Reciepe> request = new HttpEntity<>(reciepes);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity request = new HttpEntity<>(getRecipeRequest(), headers);
         ResponseEntity entity = this.restTemplate.exchange("http://localhost:" + port + "/reciepes", HttpMethod.PUT,request, Reciepe.class);
         assertThat(entity).isNotNull();
         assertThat(entity.getStatusCodeValue()).isEqualTo(201);
     }
 
-    private void addReciepes(){
-        Reciepes reciepes = new Reciepes();
-        reciepes.setName("Curry");
-        reciepes.setDishType("Vegetarian");
-        reciepeRepository.saveAndFlush(reciepes);
-    }
-
     @AfterEach
-    public void tearDown(){
+    public void tearDown() {
         reciepeRepository.deleteAll();
     }
 }

@@ -1,17 +1,17 @@
 package com.abnamro.service;
 
-import com.abnamro.entity.Reciepes;
 import com.abnamro.exception.ReciepeException;
 import com.abnamro.model.Reciepe;
 import com.abnamro.repository.ReciepeRepository;
+import com.abnamro.service.mapper.RecipeMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.jpa.JpaSystemException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,11 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @UnitTests
 @ExtendWith(MockitoExtension.class)
-class ReciepesApiDelegateImplTest {
+class ReciepesApiDelegateImplTest extends AbstractRecipeTest {
 
 
     @Mock
-    ModelMapper mapper;
+    RecipeMapper mapper;
     @Mock
     ReciepeRepository reciepeRepository;
 
@@ -37,7 +37,7 @@ class ReciepesApiDelegateImplTest {
 
     @Test
     void givenReciepe_whenAddReciepe_thenRecipeIsCreated() {
-        Mockito.when(mapper.map(Mockito.any(Reciepe.class),Mockito.any())).thenReturn(getReciepes());
+        Mockito.when(mapper.mapRecipeToRecipesDomain(Mockito.any(Reciepe.class),Mockito.anyBoolean())).thenReturn(getReciepes());
         Mockito.when(reciepeRepository.save(Mockito.any())).thenReturn(getReciepes());
         ResponseEntity<Reciepe> entity = reciepesApiDelegate.addReciepe(getReciepe());
 
@@ -46,6 +46,17 @@ class ReciepesApiDelegateImplTest {
                 () -> assertEquals(201,entity.getStatusCodeValue())
         );
     }
+
+    @Test
+    void givenInvalidReciepe_whenAddReciepe_thenAPIErrorIsThrown() {
+        Mockito.when(mapper.mapRecipeToRecipesDomain(Mockito.any(Reciepe.class),Mockito.anyBoolean())).thenReturn(getReciepes());
+        Mockito.when(reciepeRepository.save(Mockito.any())).thenThrow(new JpaSystemException(new RuntimeException()));
+
+        ReciepeException exception = assertThrows(ReciepeException.class, () -> reciepesApiDelegate.addReciepe(getReciepe()));
+
+        assertEquals("Error while saving recipe.", exception.getMessage());
+    }
+
 
     @Test
     void givenValidReciepe_whenFindReciepe_thenRecipesAreReturned() {
@@ -75,7 +86,7 @@ class ReciepesApiDelegateImplTest {
     }
     @Test
     void givenReciepe_whenUpdateReciepe_thenRecipeIsUpdated() {
-        Mockito.when(mapper.map(Mockito.any(Reciepe.class),Mockito.any())).thenReturn(getReciepes());
+        Mockito.when(mapper.mapRecipeToRecipesDomain(Mockito.any(Reciepe.class),Mockito.anyBoolean())).thenReturn(getReciepes());
         Mockito.when(reciepeRepository.findById(Mockito.any())).thenReturn(Optional.of(getReciepes()));
         Mockito.when(reciepeRepository.save(Mockito.any())).thenReturn(getReciepes());
         ResponseEntity<Reciepe> entity = reciepesApiDelegate.updateReciepe(getReciepe());
@@ -87,19 +98,29 @@ class ReciepesApiDelegateImplTest {
     }
 
     @Test
+    void givenInvalidSpecReciepe_whenUpdateReciepe_thenAPIErrorIsThrown() {
+        Mockito.when(reciepeRepository.findById(Mockito.any())).thenThrow(new JpaSystemException(new RuntimeException()));
+
+        ReciepeException exception = assertThrows(ReciepeException.class, () -> reciepesApiDelegate.updateReciepe(getReciepe()));
+
+        assertEquals("Error while updating existing recipes.", exception.getMessage());
+    }
+
+
+    @Test
     void givenInvalidReciepe_whenUpdateReciepe_thenAPIErrorIsThrown() {
         Mockito.when(reciepeRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         ReciepeException exception = assertThrows(ReciepeException.class, () -> reciepesApiDelegate.updateReciepe(getReciepe()));
 
-        assertEquals("Recipe does not exist. Please add the recipe first.", exception.getMessage());
+        assertEquals("Recipe doesnot exist.", exception.getMessage());
     }
 
     @Test
     void givenReciepeName_whenDeleteReciepe_thenRecipesIsDeleted() {
-        Mockito.doNothing().when(reciepeRepository).deleteById(Mockito.any());
+        Mockito.doNothing().when(reciepeRepository).delete(Mockito.any());
         Mockito.when(reciepeRepository.findById(Mockito.any())).thenReturn(Optional.of(getReciepes()));
-        ResponseEntity<Void> entity = reciepesApiDelegate.deleteReciepes("curry", null);
+        ResponseEntity<Void> entity = reciepesApiDelegate.deleteReciepes("curry");
 
         assertAll(
                 () -> assertNotNull(entity),
@@ -110,26 +131,16 @@ class ReciepesApiDelegateImplTest {
     @Test
     void givenInvalidReciepe_whenDeleteReciepe_thenAPIErrorIsThrown() {
         Mockito.when(reciepeRepository.findById(Mockito.any())).thenReturn(Optional.empty());
-        ReciepeException exception = assertThrows(ReciepeException.class, () -> reciepesApiDelegate.deleteReciepes("curry", null));
+        ReciepeException exception = assertThrows(ReciepeException.class, () -> reciepesApiDelegate.deleteReciepes("curry"));
         assertEquals("No Recipe found to delete.", exception.getMessage());
     }
-    private Reciepe getReciepe(){
-        Reciepe reciepe = new Reciepe();
-        reciepe.setName("curry");
-        reciepe.setIngredient("Tomato,Curd");
-        reciepe.setAdditionalText("put curd in container,add water and tomato");
-        reciepe.setServings(2);
-        reciepe.setDishType("vegetarian");
-        return reciepe;
-    }
 
-    private Reciepes getReciepes(){
-        Reciepes reciepe = new Reciepes();
-        reciepe.setName("curry");
-        reciepe.setIngredient("Tomato,Curd");
-        reciepe.setAdditionalText("put curd in container,add water and tomato");
-        reciepe.setServings(2);
-        reciepe.setDishType("vegetarian");
-        return reciepe;
+    @Test
+    void givenDataAccessException_whenDeleteReciepe_thenAPIErrorIsThrown() {
+        Mockito.when(reciepeRepository.findById(Mockito.any())).thenThrow(new JpaSystemException(new RuntimeException()));
+
+        ReciepeException exception = assertThrows(ReciepeException.class, () -> reciepesApiDelegate.deleteReciepes("curry"));
+
+        assertEquals("Error while deleting existing recipes.", exception.getMessage());
     }
 }

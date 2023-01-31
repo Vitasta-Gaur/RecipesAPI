@@ -96,7 +96,7 @@ paths:
           required: false
           schema:
             type: string
-        - name: additionalContent
+        - name: search
           in: query
           description: additional text/content about the reciepe
           required: false
@@ -131,12 +131,6 @@ paths:
       description: delete a reciepes
       operationId: deleteReciepes
       parameters:
-        - name: api_key
-          in: header
-          description: ''
-          required: false
-          schema:
-            type: string
         - name: name
           in: path
           description: reciepe name to delete
@@ -155,26 +149,39 @@ components:
     Reciepe:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
         name:
           type: string
           example: Fish Curry
           nullable: false
         dishType:
           type: string
+          nullable: false
+          enum:
+            - Vegetarian
+            - Italian
+            - Indian
+            - American
           example: vegetarian
         ingredient:
-          type: string
-          example: tomato,potato
+          type: array
+          items:
+            type: string
+          example: ['potato','tomato']
         servings:
           type: integer
           format: int32
+          minimum: 1
           example: 7
-        additionalText:
+        instructions:
           type: string
+        cookTime:
+          type: string
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
     ApiError:
       type: object
       properties:
@@ -188,8 +195,8 @@ components:
         message:
           type: string
   requestBodies:
-    Pet:
-      description: Pet object that needs to be added to the store
+    Recipe:
+      description: Recipe object that needs to be added
       content:
         application/json:
           schema:
@@ -201,8 +208,8 @@ components:
         implicit:
           authorizationUrl: https://petstore3.swagger.io/oauth/authorize
           scopes:
-            write:pets: modify Reciepe in your account
-            read:pets: read your Reciepe
+            write:reciepes: modify Reciepe in your account
+            read:reciepes: read your Reciepe
     api_key:
       type: apiKey
       name: api_key
