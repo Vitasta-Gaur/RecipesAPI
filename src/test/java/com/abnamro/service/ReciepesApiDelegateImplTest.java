@@ -10,6 +10,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.jpa.JpaSystemException;
 
@@ -60,11 +63,8 @@ class ReciepesApiDelegateImplTest extends AbstractRecipeTest {
 
     @Test
     void givenValidReciepe_whenFindReciepe_thenRecipesAreReturned() {
-        Mockito.when(reciepeRepository.findReciepesByNameAndIngredientAndServingsAndAdditionalData(Mockito.any(),Mockito.any(),Mockito.any(),Mockito.any(),Mockito.any()))
-                .thenReturn(Arrays.asList(getReciepes()));
-
-        ResponseEntity<List<Reciepe>> reciepes = reciepesApiDelegate.findReciepes("vegetarian", 2, "tomato", "stove", "curry");
-
+        Mockito.when(reciepeRepository.findAll(Mockito.any(),Mockito.any(Pageable.class))).thenReturn( new PageImpl<>(Arrays.asList(getReciepes())));
+        ResponseEntity<List<Reciepe>> reciepes = reciepesApiDelegate.findReciepes("Vegetarian",3,"INCLUDE","Pesto",null,null,0,5);
         assertAll(
                 () -> assertNotNull(reciepes),
                 () -> assertEquals(200,reciepes.getStatusCodeValue())
@@ -73,11 +73,8 @@ class ReciepesApiDelegateImplTest extends AbstractRecipeTest {
 
     @Test
     void givenInvalidReciepe_whenFindReciepe_thenNoContentIsReturned() {
-        //Mockito.when(mapper.map(Mockito.any(Reciepe.class),Mockito.any())).thenReturn(getReciepes());
-        Mockito.when(reciepeRepository.findReciepesByNameAndIngredientAndServingsAndAdditionalData(Mockito.any(),Mockito.any(),Mockito.any(),Mockito.any(),Mockito.any()))
-                .thenReturn(null);
-
-        ResponseEntity<List<Reciepe>> reciepes = reciepesApiDelegate.findReciepes("vegetarian", 2, "tomato", "stove", "curry");
+        Mockito.when(reciepeRepository.findAll(Mockito.any(),Mockito.any(Pageable.class))).thenReturn(Page.empty());
+        ResponseEntity<List<Reciepe>> reciepes = reciepesApiDelegate.findReciepes("Vegetarian",3,"INCLUDE","Pesto",null,null,0,5);
 
         assertAll(
                 () -> assertNotNull(reciepes),

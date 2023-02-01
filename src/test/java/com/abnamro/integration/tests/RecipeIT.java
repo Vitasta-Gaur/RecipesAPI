@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
@@ -37,7 +38,7 @@ public class RecipeIT extends AbstractIntegrationTest {
 
     @Test
     public void whenGetReciepes_thenStatus204() throws Exception {
-        ResponseEntity<Reciepe> reciepe = this.restTemplate.getForEntity("http://localhost:" + port + "/reciepes",
+        ResponseEntity<Reciepe> reciepe = this.restTemplate.getForEntity("http://localhost:" + port + "/reciepes?start=0&end=5",
                 Reciepe.class);
         assertThat(reciepe).isNotNull();
         assertThat(reciepe.getStatusCodeValue()).isEqualTo(204);
@@ -45,8 +46,8 @@ public class RecipeIT extends AbstractIntegrationTest {
 
     @Test
     public void whenGetReciepes_thenStatus200() throws Exception {
-        reciepeRepository.saveAndFlush(getReciepes());
-        ResponseEntity<List> entity = this.restTemplate.getForEntity("http://localhost:" + port + "/reciepes",
+        reciepeRepository.save(getReciepes());
+        ResponseEntity<List> entity = this.restTemplate.getForEntity("http://localhost:" + port + "/reciepes?start=0&end=5",
                 List.class);
         assertThat(entity).isNotNull();
         assertThat(entity.getStatusCodeValue()).isEqualTo(200);
@@ -55,7 +56,7 @@ public class RecipeIT extends AbstractIntegrationTest {
 
     @Test
     public void whenDeleteReciepes_thenStatus200() throws Exception {
-        reciepeRepository.saveAndFlush(getReciepes());
+        reciepeRepository.save(getReciepes());
         ResponseEntity entity = this.restTemplate.exchange("http://localhost:" + port + "/reciepes/Curry", HttpMethod.DELETE,null, RequestEntity.class);
         assertThat(entity).isNotNull();
         assertThat(entity.getStatusCodeValue()).isEqualTo(200);
@@ -71,7 +72,7 @@ public class RecipeIT extends AbstractIntegrationTest {
 
     @Test
     public void whenUpdateReciepes_thenStatus201() throws Exception {
-        reciepeRepository.saveAndFlush(getReciepes());
+        reciepeRepository.save(getReciepes());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

@@ -90,6 +90,14 @@ paths:
           required: false
           schema:
             type: integer
+        - name: key
+          in: query
+          description: attribute to define include/exclude the ingredient
+          schema:
+            type: string
+            enum:
+              - INCLUDE
+              - EXCLUDE
         - name: ingredient
           in: query
           description: Ingredient of the reciepe
@@ -108,6 +116,14 @@ paths:
           required: false
           schema:
             type: string
+        - name: start
+          in: query
+          schema:
+            type: integer
+        - name: end
+          in: query
+          schema:
+            type: integer
       responses:
         '200':
           description: successful operation

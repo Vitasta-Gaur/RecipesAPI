@@ -1,6 +1,9 @@
 package com.abnamro.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,6 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.OffsetDateTime;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Data
 @Entity
 @Table(name = "reciepes")
@@ -19,6 +25,7 @@ public class Reciepes {
     @Column(name = "ingredient", columnDefinition = "text")
     private String ingredient;
     private Integer servings;
+
     @Column(columnDefinition = "text")
     private String instructions;
     @Column(name = "dish_type")

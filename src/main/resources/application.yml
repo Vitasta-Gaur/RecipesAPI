@@ -6,5 +6,6 @@ spring:
     driverClassName: org.postgresql.Driver
   jpa:
     spring.jpa.database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
 
 
