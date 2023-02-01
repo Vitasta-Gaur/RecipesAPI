@@ -110,7 +110,7 @@ curl -X 'POST' \
 ```
 curl -X 'GET' \
   'http://localhost:8080/reciepes?dishType=Vegetarian&servings=2&
-  ingredient=Pesto&search=oven&name=Curry' \
+  ingredient=Pesto&search=oven&name=Curry&start=0&end=3' \
   -H 'accept: application/json'
 
 ```
